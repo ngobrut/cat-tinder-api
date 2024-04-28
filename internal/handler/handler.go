@@ -1,0 +1,58 @@
+package handler
+
+import (
+	"net/http"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/ngobrut/cat-tinder-api/config"
+	"github.com/ngobrut/cat-tinder-api/internal/http/response"
+	"github.com/ngobrut/cat-tinder-api/internal/middleware"
+	"github.com/ngobrut/cat-tinder-api/internal/usecase"
+)
+
+type Handler struct {
+	uc usecase.IFaceUsecase
+}
+
+func InitHTTPHandler(cnf *config.Config, uc usecase.IFaceUsecase) *fiber.App {
+	h := Handler{
+		uc: uc,
+	}
+
+	m := middleware.Middleware{
+		JWTSecret: cnf.JWTSecret,
+	}
+
+	app := fiber.New(fiber.Config{
+		BodyLimit: 50 * 1024 * 1024,
+	})
+
+	app.Use(cors.New())
+	app.Use(logger.New())
+	app.Use(recover.New(recover.Config{
+		EnableStackTrace: true,
+	}))
+
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.Status(http.StatusOK).JSON(response.JsonResponse{
+			Message: "hello!",
+			Data: fiber.Map{
+				"app-name": "cat-tinder-api",
+			},
+		})
+	})
+
+	api := app.Group("/api/v1")
+
+	user := api.Group("/user")
+	user.Post("/register", h.Register)
+	user.Post("/login", h.Login)
+
+	profile := user.Group("/profile", m.Authorize())
+	profile.Get("/", h.GetProfile)
+
+	return app
+}

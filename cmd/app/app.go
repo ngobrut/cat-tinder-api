@@ -1,0 +1,30 @@
+package app
+
+import (
+	"github.com/ngobrut/cat-tinder-api/config"
+
+	"github.com/ngobrut/cat-tinder-api/internal/handler"
+	"github.com/ngobrut/cat-tinder-api/internal/repository"
+	"github.com/ngobrut/cat-tinder-api/internal/usecase"
+	"github.com/ngobrut/cat-tinder-api/pkg/postgres"
+)
+
+func Exec() error {
+	cnf := config.New()
+
+	db, err := postgres.NewDBClient(cnf)
+	if err != nil {
+		return err
+	}
+
+	repo := repository.New(db)
+	uc := usecase.New(cnf, db, repo)
+	app := handler.InitHTTPHandler(cnf, uc)
+
+	err = app.Listen(":8080")
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
