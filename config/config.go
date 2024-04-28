@@ -7,11 +7,10 @@ import (
 )
 
 type Config struct {
-	Environment string
-	JWTSecret   string
-	BcryptSalt  int
-	Postgres    Postgres
-	AWSConfig   AWSConfig
+	JWTSecret  string
+	BcryptSalt int
+	Postgres   Postgres
+	AWSConfig  AWSConfig
 }
 
 type Postgres struct {
@@ -21,7 +20,6 @@ type Postgres struct {
 	User     string
 	Password string
 	Params   string
-	URI      string
 }
 
 type AWSConfig struct {
@@ -29,7 +27,6 @@ type AWSConfig struct {
 	AccessKeySecret string
 	Bucket          string
 	Region          string
-	URL             string
 }
 
 func New() *Config {
@@ -42,9 +39,8 @@ func New() *Config {
 	viper.AutomaticEnv()
 
 	return &Config{
-		Environment: v.GetString("ENV"),
-		JWTSecret:   v.GetString("JWT_SECRET"),
-		BcryptSalt:  v.GetInt("BCRYPT_SALT"),
+		JWTSecret:  v.GetString("JWT_SECRET"),
+		BcryptSalt: v.GetInt("BCRYPT_SALT"),
 		Postgres: Postgres{
 			Host:     v.GetString("DB_HOST"),
 			Port:     v.GetString("DB_PORT"),
@@ -52,14 +48,12 @@ func New() *Config {
 			User:     v.GetString("DB_USERNAME"),
 			Password: v.GetString("DB_PASSWORD"),
 			Params:   v.GetString("DB_PARAMS"),
-			URI:      v.GetString("DB_URI"),
 		},
 		AWSConfig: AWSConfig{
 			AccessKeyID:     v.GetString("S3_ID"),
 			AccessKeySecret: v.GetString("S3_SECRET_KEY"),
 			Bucket:          v.GetString("S3_BUCKET_NAME"),
 			Region:          v.GetString("S3_REGION"),
-			URL:             v.GetString("S3_URL"),
 		},
 	}
 }
