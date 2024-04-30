@@ -12,4 +12,10 @@ type IFaceUsecase interface {
 	Register(req *request.Register) (*response.Register, error)
 	Login(req *request.Login) (*response.Login, error)
 	GetProfile(userID uuid.UUID) (*model.User, error)
+
+	// manageCat
+	CreateCat(req *request.CreateCat, userID uuid.UUID) (*response.CreateCat, error)
+	// UpdateCat(req *request.UpdateCat) error
+	// GetCat(catID uuid.UUID) (*response.GetCats, error) // tbd
+	// DeleteCat(catID uuid.UUID) error
 }

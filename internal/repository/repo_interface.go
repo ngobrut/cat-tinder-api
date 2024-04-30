@@ -10,4 +10,7 @@ type IFaceRepository interface {
 	CreateUser(data *model.User) error
 	FindOneUserByID(userID uuid.UUID) (*model.User, error)
 	FindOneUserByEmail(email string) (*model.User, error)
+
+	// cat
+	CreateCat(data *model.Cat) error
 }
