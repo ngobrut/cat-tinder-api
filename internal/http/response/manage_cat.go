@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/ngobrut/cat-tinder-api/internal/model"
+	"github.com/ngobrut/cat-tinder-api/pkg/constant"
 )
 
 type CreateCat struct {
@@ -13,13 +13,13 @@ type CreateCat struct {
 }
 
 type GetCats struct {
-	CatID       uuid.UUID     `json:"id"`
-	Name        string        `json:"name"`
-	Race        model.CatRace `json:"race"`
-	Sex         model.CatSex  `json:"sex"`
-	AgeInMonth  int           `json:"ageInMonth"`
-	ImageUrls   []string      `json:"imageUrls"`
-	Description string        `json:"description"`
-	HasMatched  bool          `json:"hasMatched"`
-	CreatedAt   time.Time     `json:"createdAt"`
+	CatID       uuid.UUID        `json:"id"`
+	Name        string           `json:"name"`
+	Race        constant.CatRace `json:"race"`
+	Sex         constant.CatSex  `json:"sex"`
+	AgeInMonth  int              `json:"ageInMonth"`
+	ImageUrls   []string         `json:"imageUrls"`
+	Description string           `json:"description"`
+	HasMatched  bool             `json:"hasMatched"`
+	CreatedAt   time.Time        `json:"createdAt"`
 }

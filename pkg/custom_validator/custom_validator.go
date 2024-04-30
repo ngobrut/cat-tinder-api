@@ -10,8 +10,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/ngobrut/cat-tinder-api/pkg/constant"
 	"github.com/ngobrut/cat-tinder-api/pkg/custom_error"
-
-	"github.com/ngobrut/cat-tinder-api/internal/model"
 )
 
 type ValidatorError struct {
@@ -61,9 +59,9 @@ func ValidateStruct(c *fiber.Ctx, data interface{}) error {
 		case "gt":
 			message = fmt.Sprintf("%s must be greater than %s", field.Field(), field.Param())
 		case "catRace":
-			message = fmt.Sprintf("%s must be one of %s", field.Field(), strings.Join(model.CatRaces, ", "))
+			message = fmt.Sprintf("%s must be one of %s", field.Field(), strings.Join(constant.CatRaces, ", "))
 		case "catSex":
-			message = fmt.Sprintf("%s must be one of %s", field.Field(), strings.Join(model.CatSexs, ", "))
+			message = fmt.Sprintf("%s must be one of %s", field.Field(), strings.Join(constant.CatSexs, ", "))
 		case "imageUrls":
 			message = fmt.Sprintf("%s must be greater than 1 and should be url", field.Field())
 		}
@@ -81,9 +79,9 @@ func ValidateStruct(c *fiber.Ctx, data interface{}) error {
 }
 
 func validateCatRace(fl validator.FieldLevel) bool {
-	race := model.CatRace(fl.Field().String())
+	race := constant.CatRace(fl.Field().String())
 	switch race {
-	case model.Persian, model.MaineCoon, model.Siamese, model.Ragdoll, model.Bengal, model.Sphynx, model.BritishShorthair, model.Abyssinian, model.ScottishFold, model.Birman:
+	case constant.Persian, constant.MaineCoon, constant.Siamese, constant.Ragdoll, constant.Bengal, constant.Sphynx, constant.BritishShorthair, constant.Abyssinian, constant.ScottishFold, constant.Birman:
 		return true
 	default:
 		return false
@@ -91,9 +89,9 @@ func validateCatRace(fl validator.FieldLevel) bool {
 }
 
 func validateCatSex(fl validator.FieldLevel) bool {
-	sex := model.CatSex(fl.Field().String())
+	sex := constant.CatSex(fl.Field().String())
 	switch sex {
-	case model.Male, model.Female:
+	case constant.Male, constant.Female:
 		return true
 	default:
 		return false
