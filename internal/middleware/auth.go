@@ -19,7 +19,7 @@ func (m Middleware) Authorize() func(c *fiber.Ctx) error {
 		token := c.Get("Authorization")
 		if token == "" {
 			return c.Status(http.StatusUnauthorized).JSON(response.JsonResponse{
-				Message: constant.ErrorMessageMap[http.StatusUnauthorized],
+				Message: "error:unauthorized",
 				Error: &response.ErrorResponse{
 					Code:    http.StatusUnauthorized,
 					Message: constant.ErrorMessageMap[http.StatusUnauthorized],
@@ -33,7 +33,7 @@ func (m Middleware) Authorize() func(c *fiber.Ctx) error {
 
 		if err != nil {
 			return c.Status(http.StatusUnauthorized).JSON(response.JsonResponse{
-				Message: constant.ErrorMessageMap[http.StatusUnauthorized],
+				Message: "error:unauthorized",
 				Error: &response.ErrorResponse{
 					Code:    http.StatusUnauthorized,
 					Message: constant.ErrorMessageMap[http.StatusUnauthorized],
@@ -44,7 +44,7 @@ func (m Middleware) Authorize() func(c *fiber.Ctx) error {
 		claims, ok := parsed.Claims.(*custom_jwt.CustomClaims)
 		if !ok && !parsed.Valid {
 			return c.Status(http.StatusUnauthorized).JSON(response.JsonResponse{
-				Message: constant.ErrorMessageMap[http.StatusUnauthorized],
+				Message: "error:unauthorized",
 				Error: &response.ErrorResponse{
 					Code:    http.StatusUnauthorized,
 					Message: constant.ErrorMessageMap[http.StatusUnauthorized],
