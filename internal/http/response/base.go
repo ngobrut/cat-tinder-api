@@ -13,14 +13,7 @@ import (
 type JsonResponse struct {
 	Message string         `json:"message"`
 	Data    interface{}    `json:"data"`
-	Meta    *JsonMetadata  `json:"meta"`
 	Error   *ErrorResponse `json:"error"`
-}
-
-type JsonMetadata struct {
-	Limit  int `json:"limit"`
-	Offset int `json:"offset"`
-	Total  int `json:"total"`
 }
 
 type ErrorResponse struct {
@@ -32,16 +25,6 @@ func OK(c *fiber.Ctx, data interface{}, code int, message string) error {
 	return c.Status(code).JSON(JsonResponse{
 		Message: message,
 		Data:    data,
-	})
-}
-
-func Paging(c *fiber.Ctx, data interface{}, total int, limit int, offset int, message string) error {
-	var metadata *JsonMetadata
-
-	return c.Status(http.StatusOK).JSON(JsonResponse{
-		Message: message,
-		Data:    data,
-		Meta:    metadata,
 	})
 }
 
@@ -62,7 +45,7 @@ func Error(c *fiber.Ctx, err error) error {
 		fmt.Printf("[unhandled-error]\n%v\n", fmt.Sprint(err))
 
 		return c.Status(http.StatusInternalServerError).JSON(JsonResponse{
-			Message: constant.ErrorMessageMap[http.StatusInternalServerError],
+			Message: "internal-error",
 			Error: &ErrorResponse{
 				Code:    http.StatusInternalServerError,
 				Message: constant.ErrorMessageMap[http.StatusInternalServerError],
@@ -83,7 +66,7 @@ func Error(c *fiber.Ctx, err error) error {
 	}
 
 	return c.Status(code).JSON(JsonResponse{
-		Message: "error:bad-request",
+		Message: "Error",
 		Error: &ErrorResponse{
 			Code:    code,
 			Message: message,

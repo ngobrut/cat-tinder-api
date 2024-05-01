@@ -28,7 +28,7 @@ func (h *Handler) CreateCatMatch(c *fiber.Ctx) error {
 		return response.Error(c, err)
 	}
 
-	return response.OK(c, nil, http.StatusCreated, "Success")
+	return response.OK(c, nil, http.StatusCreated, "Cat match request created successfully")
 }
 
 func (h *Handler) GetListCatMatch(c *fiber.Ctx) error {
@@ -56,15 +56,49 @@ func (h *Handler) ApproveCatMatch(c *fiber.Ctx) error {
 		return response.Error(c, err)
 	}
 
-	userID, err := uuid.Parse(util.GetUserIDFromHeader(c))
+	req.UserId, err = uuid.Parse(util.GetUserIDFromHeader(c))
 	if err != nil {
 		return response.Error(c, err)
 	}
-	req.UserId = userID
 
 	err = h.uc.ApproveCatMatch(c, &req)
 	if err != nil {
 		return err
 	}
+
 	return response.OK(c, nil, http.StatusOK, "successfully matches the cat match request")
+}
+
+func (h *Handler) RejectCatMatch(c *fiber.Ctx) error {
+	var req request.RejectCatMatch
+	err := custom_validator.ValidateStruct(c, &req)
+	if err != nil {
+		return response.Error(c, err)
+	}
+
+	req.UserID, err = uuid.Parse(util.GetUserIDFromHeader(c))
+	if err != nil {
+		return response.Error(c, err)
+	}
+
+	err = h.uc.RejectCatMatch(c, &req)
+	if err != nil {
+		return response.Error(c, err)
+	}
+
+	return response.OK(c, nil, http.StatusOK, "Cat match request rejected successfully")
+}
+
+func (h *Handler) DeleteCatMatch(c *fiber.Ctx) error {
+	ID, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return response.Error(c, err)
+	}
+
+	err = h.uc.DeleteCatMatch(c, ID)
+	if err != nil {
+		return response.Error(c, err)
+	}
+
+	return response.OK(c, nil, http.StatusOK, "Cat match request deleted successfully")
 }

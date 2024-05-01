@@ -2,6 +2,10 @@ package request
 
 import "github.com/google/uuid"
 
+type ListCatMatchQuery struct {
+	UserID uuid.UUID
+}
+
 type CreateCatMatch struct {
 	MatchCatID uuid.UUID `json:"matchCatId" validate:"required"`
 	UserCatID  uuid.UUID `json:"userCatId" validate:"required"`
@@ -9,8 +13,9 @@ type CreateCatMatch struct {
 	UserID     uuid.UUID `json:"-"`
 }
 
-type ListCatMatchQuery struct {
-	UserID uuid.UUID
+type RejectCatMatch struct {
+	MatchID uuid.UUID `json:"matchId"`
+	UserID  uuid.UUID `json:"-"`
 }
 
 type ApproveCatMatch struct {
