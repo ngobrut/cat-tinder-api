@@ -9,13 +9,13 @@ import (
 type Register struct {
 	Email       string `json:"email"`
 	Name        string `json:"name"`
-	AccessToken string `json:"access_token"`
+	AccessToken string `json:"accessToken"`
 }
 
 type Login struct {
 	Email       string `json:"email"`
 	Name        string `json:"name"`
-	AccessToken string `json:"access_token"`
+	AccessToken string `json:"accessToken"`
 }
 
 type Profile struct {
