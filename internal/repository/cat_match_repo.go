@@ -194,6 +194,7 @@ func (r *Repository) FindOneCatMatchByID(ID uuid.UUID) (*model.CatMatch, error) 
 
 	return res, nil
 }
+
 func (r *Repository) ApproveCatMatch(matchID uuid.UUID) error {
 	var issuerCatID uuid.UUID
 	var receiverCatID uuid.UUID

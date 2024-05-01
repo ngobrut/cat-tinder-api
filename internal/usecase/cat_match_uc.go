@@ -194,6 +194,7 @@ func (u *Usecase) ApproveCatMatch(c *fiber.Ctx, req *request.ApproveCatMatch) er
 	return nil
 }
 
+// RejectCatMatch implements IFaceUsecase.
 func (u *Usecase) RejectCatMatch(c *fiber.Ctx, req *request.RejectCatMatch) error {
 	cm, err := u.repo.FindOneCatMatchByID(req.MatchID)
 	if err != nil && !repository.IsRecordNotFound(err) {
