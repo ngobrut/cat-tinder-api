@@ -6,16 +6,18 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/go-playground/locales/en"
+	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
+	en_translations "github.com/go-playground/validator/v10/translations/en"
 	"github.com/gofiber/fiber/v2"
 	"github.com/ngobrut/cat-tinder-api/pkg/constant"
 	"github.com/ngobrut/cat-tinder-api/pkg/custom_error"
 )
 
 type ValidatorError struct {
-	Code     int      `json:"code"`
-	Message  string   `json:"message"`
-	Messages []string `json:"messages"`
+	Code    int    `json:"code"`
+	Message string `json:"message"`
 }
 
 func (o ValidatorError) Error() string {
@@ -34,68 +36,48 @@ func ValidateStruct(c *fiber.Ctx, data interface{}) error {
 	}
 
 	validate := validator.New()
+	eng := en.New()
+	uni := ut.New(eng, eng)
+	trans, _ := uni.GetTranslator("en")
+	_ = en_translations.RegisterDefaultTranslations(validate, trans)
+
 	validate.RegisterValidation("catRace", validateCatRace)
 	validate.RegisterValidation("catSex", validateCatSex)
 	validate.RegisterValidation("imageUrls", validateImageUrls)
+
 	err = validate.Struct(data)
 	if err == nil {
 		return nil
 	}
 
 	var message string
-	var messages = make([]string, 0)
-
 	for _, field := range err.(validator.ValidationErrors) {
+		message = field.Translate(trans)
 
 		switch field.Tag() {
-		case "required":
-			message = fmt.Sprintf("%s is required", field.Field())
-		case "email":
-			message = fmt.Sprintf("%s is not in the correct email format", field.Field())
-		case "min":
-			message = fmt.Sprintf("%s must be %s character minimal", field.Field(), field.Param())
-		case "max":
-			message = fmt.Sprintf("%s cannot be more than %s character", field.Field(), field.Param())
-		case "gt":
-			message = fmt.Sprintf("%s must be greater than %s", field.Field(), field.Param())
 		case "catRace":
-			message = fmt.Sprintf("%s must be one of %s", field.Field(), strings.Join(constant.CatRaces, ", "))
+			message = fmt.Sprintf("%s must be one of [%s]", field.Field(), strings.Join(constant.CatRaces, ", "))
 		case "catSex":
-			message = fmt.Sprintf("%s must be one of %s", field.Field(), strings.Join(constant.CatSexs, ", "))
+			message = fmt.Sprintf("%s must be one of [%s]", field.Field(), strings.Join(constant.CatSexes, ", "))
 		case "imageUrls":
 			message = fmt.Sprintf("%s must be greater than 1 and should be url", field.Field())
 		}
-
-		messages = append(messages, message)
 	}
 
 	err = ValidatorError{
-		Code:     http.StatusBadRequest,
-		Message:  message,
-		Messages: messages,
+		Code:    http.StatusBadRequest,
+		Message: message,
 	}
 
 	return err
 }
 
 func validateCatRace(fl validator.FieldLevel) bool {
-	race := constant.CatRace(fl.Field().String())
-	switch race {
-	case constant.Persian, constant.MaineCoon, constant.Siamese, constant.Ragdoll, constant.Bengal, constant.Sphynx, constant.BritishShorthair, constant.Abyssinian, constant.ScottishFold, constant.Birman:
-		return true
-	default:
-		return false
-	}
+	return constant.ValidCatRace[fl.Field().String()]
 }
 
 func validateCatSex(fl validator.FieldLevel) bool {
-	sex := constant.CatSex(fl.Field().String())
-	switch sex {
-	case constant.Male, constant.Female:
-		return true
-	default:
-		return false
-	}
+	return constant.ValidCatSex[fl.Field().String()]
 }
 
 func validateImageUrls(fl validator.FieldLevel) bool {
@@ -103,6 +85,7 @@ func validateImageUrls(fl validator.FieldLevel) bool {
 	if !ok {
 		return false
 	}
+
 	if len(urls) < 1 {
 		return false
 	}
@@ -121,6 +104,11 @@ func isValidURL(s string) bool {
 	if err != nil {
 		return false
 	}
+
 	u, err := url.Parse(s)
-	return err == nil && u.Scheme != "" && u.Host != ""
+	if err != nil {
+		return false
+	}
+
+	return u.Scheme != "" && u.Host != ""
 }
