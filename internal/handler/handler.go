@@ -56,6 +56,9 @@ func InitHTTPHandler(cnf *config.Config, uc usecase.IFaceUsecase) *fiber.App {
 
 	manageCat := api.Group("/cat", m.Authorize())
 	manageCat.Post("/", h.CreateCat)
+	manageCat.Get("/", h.GetListCat)
+	manageCat.Put("/:id", h.UpdateCat)
+	manageCat.Delete("/:id", h.DeleteCat)
 
 	return app
 }

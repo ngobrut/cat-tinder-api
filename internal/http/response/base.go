@@ -24,9 +24,8 @@ type JsonMetadata struct {
 }
 
 type ErrorResponse struct {
-	Code       int      `json:"code"`
-	Message    string   `json:"message"`
-	Validation []string `json:"validation"`
+	Code    int    `json:"code"`
+	Message string `json:"message"`
 }
 
 func OK(c *fiber.Ctx, data interface{}, code int, message string) error {
@@ -36,15 +35,24 @@ func OK(c *fiber.Ctx, data interface{}, code int, message string) error {
 	})
 }
 
+func Paging(c *fiber.Ctx, data interface{}, total int, limit int, offset int, message string) error {
+	var metadata *JsonMetadata
+
+	return c.Status(http.StatusOK).JSON(JsonResponse{
+		Message: message,
+		Data:    data,
+		Meta:    metadata,
+	})
+}
+
 func Error(c *fiber.Ctx, err error) error {
 	v, isValidationErr := err.(custom_validator.ValidatorError)
 	if isValidationErr {
 		return c.Status(http.StatusBadRequest).JSON(JsonResponse{
 			Message: "validation-error",
 			Error: &ErrorResponse{
-				Code:       v.Code,
-				Message:    "validation-error",
-				Validation: v.Messages,
+				Code:    v.Code,
+				Message: v.Message,
 			},
 		})
 	}

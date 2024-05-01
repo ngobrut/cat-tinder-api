@@ -13,35 +13,77 @@ import (
 )
 
 func (h *Handler) CreateCat(c *fiber.Ctx) error {
-	userID, err := uuid.Parse(util.GetUserIDFromHeader(c))
-	if err != nil {
-		return response.Error(c, err)
-	}
-
 	var req request.CreateCat
-	err = custom_validator.ValidateStruct(c, &req)
+	err := custom_validator.ValidateStruct(c, &req)
 	if err != nil {
 		return response.Error(c, err)
 	}
 
-	res, err := h.uc.CreateCat(&req, userID)
+	req.UserID, err = uuid.Parse(util.GetUserIDFromHeader(c))
 	if err != nil {
 		return response.Error(c, err)
 	}
-	return response.OK(c, res, http.StatusCreated, "successfully add cat")
+
+	res, err := h.uc.CreateCat(&req)
+	if err != nil {
+		return response.Error(c, err)
+	}
+
+	return response.OK(c, res, http.StatusCreated, "Cat added successfully")
+}
+
+func (h *Handler) GetListCat(c *fiber.Ctx) error {
+	var params request.ListCatQuery
+	err := c.QueryParser(&params)
+	if err != nil {
+		return response.Error(c, err)
+	}
+
+	if params.Owned != "" {
+		params.UserID, err = uuid.Parse(util.GetUserIDFromHeader(c))
+		if err != nil {
+			return response.Error(c, err)
+		}
+	}
+
+	res, err := h.uc.GetListCat(&params)
+	if err != nil {
+		return response.Error(c, err)
+	}
+
+	return response.OK(c, res, http.StatusOK, "Success")
 }
 
 func (h *Handler) UpdateCat(c *fiber.Ctx) error {
-	// to do
-	return nil
-}
+	var req request.UpdateCat
+	err := custom_validator.ValidateStruct(c, &req)
+	if err != nil {
+		return response.Error(c, err)
+	}
 
-func (h *Handler) GetCats(c *fiber.Ctx) error {
-	// to do
-	return nil
+	req.CatID, err = uuid.Parse(c.Params("id"))
+	if err != nil {
+		return response.Error(c, err)
+	}
+
+	err = h.uc.UpdateCat(c, &req)
+	if err != nil {
+		return response.Error(c, err)
+	}
+
+	return response.OK(c, nil, http.StatusOK, "Cat updated successfully")
 }
 
 func (h *Handler) DeleteCat(c *fiber.Ctx) error {
-	// to do
-	return nil
+	catID, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return response.Error(c, err)
+	}
+
+	err = h.uc.DeleteCat(c, catID)
+	if err != nil {
+		return response.Error(c, err)
+	}
+
+	return response.OK(c, nil, http.StatusOK, "Cat deleted successfully")
 }

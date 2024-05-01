@@ -12,7 +12,7 @@ type CreateCat struct {
 	CreatedAt string    `json:"createdAt"`
 }
 
-type GetCats struct {
+type CatResponse struct {
 	CatID       uuid.UUID        `json:"id"`
 	Name        string           `json:"name"`
 	Race        constant.CatRace `json:"race"`
