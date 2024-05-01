@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/lib/pq"
 	"github.com/ngobrut/cat-tinder-api/internal/http/request"
+	"github.com/ngobrut/cat-tinder-api/internal/http/response"
 	"github.com/ngobrut/cat-tinder-api/internal/model"
 	"github.com/ngobrut/cat-tinder-api/pkg/custom_error"
 )
@@ -81,92 +82,83 @@ func (r *Repository) FindOneCatMatchByCatID(catID uuid.UUID) (*model.CatMatch, e
 }
 
 // FindCatMatch implements IFaceRepository.
-func (r *Repository) FindCatMatch(params *request.ListCatMatchQuery) ([]*model.CatMatch, error) {
-	var res = make([]*model.CatMatch, 0)
+func (r *Repository) FindCatMatch(params *request.ListCatMatchQuery) ([]*response.CatMatchResponse, error) {
+	var res = make([]*response.CatMatchResponse, 0)
 
-	rows, err := r.db.Query("SELECT * FROM cat_matches WHERE (issuer_user_id = $1 OR receiver_user_id = $2) AND deleted_at IS NULL ORDER BY created_at DESC", params.UserID, params.UserID)
+	query := `
+		SELECT cm.id        as cm_id,
+		u.name              AS u_name,
+		u.email             AS u_email,
+		TO_CHAR(U.created_at, 'YYYY-MM-DD HH24:MI:SS')        AS u_created_at,
+		c2.cat_id           AS c2_cat_id,
+		c2.name             AS c2_name,
+		c2.race             AS c2_race,
+		c2.sex              AS c2_sex,
+		c2.description      AS c2_description,
+		c2.age_in_month     AS c2_age_in_month,
+		c2.image_urls       AS c2_image_urls,
+		c2.has_matched      AS c2_has_matched,
+		TO_CHAR(c2.created_at, 'YYYY-MM-DD HH24:MI:SS')       AS c2_created_at,
+		c1.cat_id           AS c1_cat_id,
+		c1.name             AS c1_name,
+		c1.race             AS c1_race,
+		c1.sex              AS c1_sex,
+		c1.description      AS c1_description,
+		c1.age_in_month     AS c1_age_in_month,
+		c1.image_urls       AS c1_image_urls,
+		c1.has_matched      AS c1_has_matched,
+		TO_CHAR(c1.created_at, 'YYYY-MM-DD HH24:MI:SS')       AS c1_created_at,
+		cm.message          as cm_message,
+		TO_CHAR(cm.created_at, 'YYYY-MM-DD HH24:MI:SS')       as cm_created_at
+		FROM cat_matches cm
+				LEFT JOIN cats c1 ON c1.cat_id = cm.issuer_cat_id
+				LEFT JOIN cats c2 ON c2.cat_id = cm.receiver_cat_id
+				LEFT JOIN users u ON u.user_id = cm.issuer_user_id
+		WHERE (cm.issuer_user_id = $1 OR cm.receiver_user_id = $2)
+		AND cm.deleted_at IS NULL
+		ORDER BY cm.created_at DESC
+	`
+
+	rows, err := r.db.Query(query, params.UserID, params.UserID)
 	if err != nil {
 		return nil, err
 	}
 
 	for rows.Next() {
-		cm := &model.CatMatch{}
+		cmr := &response.CatMatchResponse{}
+
 		if err := rows.Scan(
-			&cm.ID,
-			&cm.IssuerUserID,
-			&cm.IssuerCatID,
-			&cm.ReceiverUserID,
-			&cm.ReceiverCatID,
-			&cm.Message,
-			&cm.IsApproved,
-			&cm.CreatedAt,
-			&cm.UpdatedAt,
-			&cm.DeletedAt,
+			&cmr.ID,
+			&cmr.IssuedBy.Name,
+			&cmr.IssuedBy.Email,
+			&cmr.IssuedBy.CreatedAt,
+			&cmr.MatchCatDetail.CatID,
+			&cmr.MatchCatDetail.Name,
+			&cmr.MatchCatDetail.Race,
+			&cmr.MatchCatDetail.Sex,
+			&cmr.MatchCatDetail.Description,
+			&cmr.MatchCatDetail.AgeInMonth,
+			pq.Array(&cmr.MatchCatDetail.ImageURLs),
+			&cmr.MatchCatDetail.HasMatched,
+			&cmr.MatchCatDetail.CreatedAt,
+			&cmr.UserCatDetail.CatID,
+			&cmr.UserCatDetail.Name,
+			&cmr.UserCatDetail.Race,
+			&cmr.UserCatDetail.Sex,
+			&cmr.UserCatDetail.Description,
+			&cmr.UserCatDetail.AgeInMonth,
+			pq.Array(&cmr.UserCatDetail.ImageURLs),
+			&cmr.UserCatDetail.HasMatched,
+			&cmr.UserCatDetail.CreatedAt,
+			&cmr.Message,
+			&cmr.CreatedAt,
 		); err != nil {
 			return nil, err
 		}
 
-		ic := &model.Cat{}
-		if err := r.db.
-			QueryRow("SELECT * FROM cats WHERE cat_id = $1", cm.IssuerCatID).
-			Scan(
-				&ic.CatID,
-				&ic.UserID,
-				&ic.Name,
-				&ic.Race,
-				&ic.Sex,
-				&ic.AgeInMonth,
-				&ic.Description,
-				&ic.HasMatched,
-				pq.Array(&ic.ImageURLs),
-				&ic.CreatedAt,
-				&ic.UpdatedAt,
-				&ic.DeletedAt,
-			); err != nil {
-			return nil, err
-		}
-
-		rc := &model.Cat{}
-		if err := r.db.
-			QueryRow("SELECT * FROM cats WHERE cat_id = $1", cm.ReceiverCatID).
-			Scan(
-				&rc.CatID,
-				&rc.UserID,
-				&rc.Name,
-				&rc.Race,
-				&rc.Sex,
-				&rc.AgeInMonth,
-				&rc.Description,
-				&rc.HasMatched,
-				pq.Array(&rc.ImageURLs),
-				&rc.CreatedAt,
-				&rc.UpdatedAt,
-				&rc.DeletedAt,
-			); err != nil {
-			return nil, err
-		}
-
-		issuer := &model.User{}
-		if err := r.db.
-			QueryRow("SELECT * FROM users WHERE user_id = $1", cm.IssuerUserID).
-			Scan(
-				&issuer.UserID,
-				&issuer.Name,
-				&issuer.Email,
-				&issuer.Password,
-				&issuer.CreatedAt,
-				&issuer.UpdatedAt,
-				&issuer.DeletedAt,
-			); err != nil {
-			return nil, err
-		}
-
-		cm.IssuerCat = ic
-		cm.ReceiverCat = rc
-		cm.Issuer = issuer
-
-		res = append(res, cm)
+		res = append(res, cmr)
 	}
+	fmt.Println(res)
 
 	return res, nil
 }

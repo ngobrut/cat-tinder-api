@@ -3,6 +3,7 @@ package repository
 import (
 	"github.com/google/uuid"
 	"github.com/ngobrut/cat-tinder-api/internal/http/request"
+	"github.com/ngobrut/cat-tinder-api/internal/http/response"
 	"github.com/ngobrut/cat-tinder-api/internal/model"
 )
 
@@ -25,7 +26,7 @@ type IFaceRepository interface {
 	CheckDuplicateMatchRequest(issuerCatID uuid.UUID, receiverCatID uuid.UUID) error
 	FindOneCatMatchByCatID(catID uuid.UUID) (*model.CatMatch, error)
 	ApproveCatMatch(matchID uuid.UUID) error
-	FindCatMatch(params *request.ListCatMatchQuery) ([]*model.CatMatch, error)
+	FindCatMatch(params *request.ListCatMatchQuery) ([]*response.CatMatchResponse, error)
 	FindOneCatMatchByID(ID uuid.UUID) (*model.CatMatch, error)
 	UpdateCatMatchByID(data map[string]interface{}, ID uuid.UUID) error
 	DeleteCatMatchByID(ID uuid.UUID) error
