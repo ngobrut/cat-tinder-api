@@ -10,7 +10,7 @@ const (
 	Ragdoll          CatRace = "Ragdoll"
 	Bengal           CatRace = "Bengal"
 	Sphynx           CatRace = "Sphynx"
-	BritishShorthair CatRace = "BritishShorthair"
+	BritishShorthair CatRace = "British Shorthair"
 	Abyssinian       CatRace = "Abyssinian"
 	ScottishFold     CatRace = "Scottish Fold"
 	Birman           CatRace = "Birman"
