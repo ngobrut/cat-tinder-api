@@ -16,4 +16,10 @@ type CatMatch struct {
 	IsApproved     *bool     `json:"is_approved" db:"is_approved"`
 	CreatedAt      time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at" db:"updated_at"`
+
+	// temp fields
+	Issuer      *User `json:"issuer" db:"-"`
+	IssuerCat   *Cat  `json:"issuer_cat" db:"-"`
+	Receiver    *User `json:"receiver" db:"-"`
+	ReceiverCat *Cat  `json:"receiver_cat" db:"-"`
 }
