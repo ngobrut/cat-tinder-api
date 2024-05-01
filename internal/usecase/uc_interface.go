@@ -18,4 +18,7 @@ type IFaceUsecase interface {
 	GetListCat(params *request.ListCatQuery) ([]*response.CatResponse, error)
 	UpdateCat(c *fiber.Ctx, req *request.UpdateCat) error
 	DeleteCat(c *fiber.Ctx, catID uuid.UUID) error
+
+	// cat match
+	CreateCatMatch(c *fiber.Ctx, req *request.CreateCatMatch) error
 }
