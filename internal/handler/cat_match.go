@@ -30,3 +30,15 @@ func (h *Handler) CreateCatMatch(c *fiber.Ctx) error {
 
 	return response.OK(c, nil, http.StatusCreated, "Success")
 }
+
+func (h *Handler) GetListCatMatch(c *fiber.Ctx) error {
+	var req request.ListCatMatchQuery
+	req.UserID, _ = uuid.Parse(util.GetUserIDFromHeader(c))
+
+	res, err := h.uc.GetListCatMatch(&req)
+	if err != nil {
+		return response.Error(c, err)
+	}
+
+	return response.OK(c, res, http.StatusOK, "Success")
+}

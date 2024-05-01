@@ -8,3 +8,7 @@ type CreateCatMatch struct {
 	Message    string    `json:"message" validate:"required,min=1,max=120"`
 	UserID     uuid.UUID `json:"-"`
 }
+
+type ListCatMatchQuery struct {
+	UserID uuid.UUID
+}

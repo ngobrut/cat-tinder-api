@@ -5,6 +5,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/ngobrut/cat-tinder-api/internal/http/request"
+	"github.com/ngobrut/cat-tinder-api/internal/http/response"
 	"github.com/ngobrut/cat-tinder-api/internal/repository"
 	"github.com/ngobrut/cat-tinder-api/pkg/custom_error"
 )
@@ -106,4 +107,11 @@ func (u *Usecase) CreateCatMatch(c *fiber.Ctx, req *request.CreateCatMatch) erro
 	// }
 
 	return nil
+}
+
+// GetListCatMatch implements IFaceUsecase.
+func (u *Usecase) GetListCatMatch(params *request.ListCatMatchQuery) ([]*response.CatMatchResponse, error) {
+	var res = make([]*response.CatMatchResponse, 0)
+
+	return res, nil
 }

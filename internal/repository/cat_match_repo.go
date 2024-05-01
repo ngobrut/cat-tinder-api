@@ -4,9 +4,17 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
+	"github.com/ngobrut/cat-tinder-api/internal/http/request"
 	"github.com/ngobrut/cat-tinder-api/internal/model"
 	"github.com/ngobrut/cat-tinder-api/pkg/custom_error"
 )
+
+// FindCatMatch implements IFaceRepository.
+func (r *Repository) FindCatMatch(params *request.ListCatMatchQuery) ([]*model.CatMatch, error) {
+	var res = make([]*model.CatMatch, 0)
+
+	return res, nil
+}
 
 // CreateCatMatch implements IFaceRepository.
 func (r *Repository) CreateCatMatch(data *model.CatMatch) error {
