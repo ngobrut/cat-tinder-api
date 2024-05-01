@@ -63,6 +63,7 @@ func InitHTTPHandler(cnf *config.Config, uc usecase.IFaceUsecase) *fiber.App {
 	catMatch := api.Group("/cat/match", m.Authorize())
 	catMatch.Post("/", h.CreateCatMatch)
 	catMatch.Get("/", h.GetListCatMatch)
+	catMatch.Post("/approve", h.ApproveCatMatch)
 
 	return app
 }

@@ -12,3 +12,8 @@ type CreateCatMatch struct {
 type ListCatMatchQuery struct {
 	UserID uuid.UUID
 }
+
+type ApproveCatMatch struct {
+	MatchID uuid.UUID `json:"matchId" validate:"required"`
+	UserId  uuid.UUID `json:"-"`
+}

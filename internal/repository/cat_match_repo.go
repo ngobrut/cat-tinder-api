@@ -2,6 +2,7 @@ package repository
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/lib/pq"
@@ -74,6 +75,7 @@ func (r *Repository) FindCatMatch(params *request.ListCatMatchQuery) ([]*model.C
 			&cm.IsApproved,
 			&cm.CreatedAt,
 			&cm.UpdatedAt,
+			&cm.DeletedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -164,4 +166,47 @@ func (r *Repository) FindOneCatMatchByCatID(catID uuid.UUID) (*model.CatMatch, e
 	}
 
 	return res, nil
+}
+
+// FindOneCatMatchByMatchID implements IFaceRepository.
+func (r *Repository) FindOneCatMatchByMatchID(matchID uuid.UUID) (*model.CatMatch, error) {
+	res := &model.CatMatch{}
+
+	if err := r.db.
+		QueryRow("SELECT * FROM cat_matches WHERE match_id = $1", matchID).
+		Scan(
+			&res.ID,
+			&res.IssuerUserID,
+			&res.IssuerCatID,
+			&res.ReceiverUserID,
+			&res.ReceiverCatID,
+			&res.Message,
+			&res.IsApproved,
+			&res.CreatedAt,
+			&res.UpdatedAt,
+		); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (r *Repository) ApproveCatMatch(matchID uuid.UUID) error {
+	var issuerCatID uuid.UUID
+	var receiverCatID uuid.UUID
+	err := r.db.
+		QueryRow("UPDATE cat_matches SET is_approved = true WHERE match_id = $1 returning issuer_cat_id, receiver_cat_id", matchID).
+		Scan(
+			&issuerCatID,
+			&receiverCatID,
+		)
+	if err != nil {
+		return err
+	}
+
+	_, err = r.db.Exec("UPDATE cat_matches SET deleted_at = $1 WHERE issuer_cat_id in ($2, $3) or receiver_cat_id in ($2, $3) ", time.Now().Format("2006-01-02 15:04:05"), issuerCatID, receiverCatID)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

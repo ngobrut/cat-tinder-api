@@ -39,19 +39,14 @@ func (u *Usecase) CreateCatMatch(c *fiber.Ctx, req *request.CreateCatMatch) erro
 	}
 
 	receiverCat, err := u.repo.FindOneCatByID(req.MatchCatID)
-	if err != nil {
-		return err
-	}
-
-	err = u.repo.CheckDuplicateMatchRequest(issuerCat.CatID, receiverCat.CatID)
-	if err != nil {
+	if err != nil && !repository.IsRecordNotFound(err) {
 		return err
 	}
 
 	if receiverCat == nil {
 		err = custom_error.SetCustomError(&custom_error.ErrorContext{
 			HTTPCode: http.StatusNotFound,
-			Message:  "issuer cat not found",
+			Message:  "receiver cat not found",
 		})
 
 		return err
@@ -90,6 +85,11 @@ func (u *Usecase) CreateCatMatch(c *fiber.Ctx, req *request.CreateCatMatch) erro
 			Message:  "both of the cats cannot be of the same sex",
 		})
 
+		return err
+	}
+
+	err = u.repo.CheckDuplicateMatchRequest(issuerCat.CatID, receiverCat.CatID)
+	if err != nil {
 		return err
 	}
 
@@ -157,4 +157,35 @@ func (u *Usecase) GetListCatMatch(params *request.ListCatMatchQuery) ([]*respons
 	}
 
 	return res, nil
+}
+
+func (u *Usecase) ApproveCatMatch(c *fiber.Ctx, req *request.ApproveCatMatch) error {
+	catMatch, err := u.repo.FindOneCatMatchByMatchID(req.MatchID)
+	if err != nil {
+		err = custom_error.SetCustomError(&custom_error.ErrorContext{
+			HTTPCode: http.StatusNotFound,
+			Message:  "matchId is not found",
+		})
+
+		return err
+	}
+
+	if req.UserId == catMatch.ReceiverUserID {
+		err = custom_error.SetCustomError(&custom_error.ErrorContext{
+			HTTPCode: http.StatusNotFound,
+			Message:  "matchId is not found",
+		})
+	}
+
+	if catMatch.IsApproved != nil && catMatch.DeletedAt != nil {
+		err = custom_error.SetCustomError(&custom_error.ErrorContext{
+			HTTPCode: http.StatusBadRequest,
+			Message:  "matchId is no longer valid",
+		})
+	}
+	err = u.repo.ApproveCatMatch(req.MatchID)
+	if err != nil {
+		return err
+	}
+	return nil
 }

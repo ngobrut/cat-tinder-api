@@ -48,3 +48,23 @@ func (h *Handler) GetListCatMatch(c *fiber.Ctx) error {
 
 	return response.OK(c, res, http.StatusOK, "Success")
 }
+
+func (h *Handler) ApproveCatMatch(c *fiber.Ctx) error {
+	var req request.ApproveCatMatch
+	err := custom_validator.ValidateStruct(c, &req)
+	if err != nil {
+		return response.Error(c, err)
+	}
+
+	userID, err := uuid.Parse(util.GetUserIDFromHeader(c))
+	if err != nil {
+		return response.Error(c, err)
+	}
+	req.UserId = userID
+
+	err = h.uc.ApproveCatMatch(c, &req)
+	if err != nil {
+		return err
+	}
+	return response.OK(c, nil, http.StatusOK, "successfully matches the cat match request")
+}
