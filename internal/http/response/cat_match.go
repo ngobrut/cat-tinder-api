@@ -13,10 +13,10 @@ type IssuedBy struct {
 }
 
 type CatMatchResponse struct {
-	Id             uuid.UUID   `json:"id"`
-	IssuedBy       *IssuedBy   `json:"issuedBy"`
-	MatchCatDetail CatResponse `json:"matchCatDetail"`
-	UserCatDetail  CatResponse `json:"userCatDetail"`
-	Message        string      `json:"message"`
-	CreatedAt      time.Time   `json:"createdAt"`
+	Id             uuid.UUID    `json:"id"`
+	IssuedBy       *IssuedBy    `json:"issuedBy"`
+	MatchCatDetail *CatResponse `json:"matchCatDetail"`
+	UserCatDetail  *CatResponse `json:"userCatDetail"`
+	Message        string       `json:"message"`
+	CreatedAt      time.Time    `json:"createdAt"`
 }
