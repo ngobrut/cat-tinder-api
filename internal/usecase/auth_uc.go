@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/ngobrut/cat-tinder-api/internal/http/request"
@@ -21,14 +22,23 @@ func (u *Usecase) Register(req *request.Register) (*response.Register, error) {
 	}
 
 	user := &model.User{
-		UserID:   uuid.New(),
-		Name:     req.Name,
-		Email:    req.Email,
-		Password: pwd,
+		UserID:    uuid.New(),
+		Name:      req.Name,
+		Email:     req.Email,
+		Password:  pwd,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 
 	err = u.repo.CreateUser(user)
 	if err != nil {
+		if repository.IsDuplicateError(err) {
+			err = custom_error.SetCustomError(&custom_error.ErrorContext{
+				HTTPCode: http.StatusConflict,
+				Message:  "email has been used",
+			})
+		}
+
 		return nil, err
 	}
 
@@ -90,13 +100,13 @@ func (u *Usecase) Login(req *request.Login) (*response.Login, error) {
 }
 
 // GetProfile implements IFaceUsecase.
-func (u *Usecase) GetProfile(userID uuid.UUID) (*model.User, error) {
+func (u *Usecase) GetProfile(userID uuid.UUID) (*response.Profile, error) {
 	user, err := u.repo.FindOneUserByID(userID)
 	if err != nil {
 		return nil, err
 	}
 
-	res := &model.User{
+	res := &response.Profile{
 		UserID:    user.UserID,
 		Name:      user.Name,
 		Email:     user.Email,
