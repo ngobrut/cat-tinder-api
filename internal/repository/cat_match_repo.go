@@ -142,3 +142,26 @@ func (r *Repository) FindCatMatch(params *request.ListCatMatchQuery) ([]*model.C
 
 	return res, nil
 }
+
+// FindOneCatMatchByCatID implements IFaceRepository.
+func (r *Repository) FindOneCatMatchByCatID(catID uuid.UUID) (*model.CatMatch, error) {
+	res := &model.CatMatch{}
+
+	if err := r.db.
+		QueryRow("SELECT * FROM cat_matches WHERE (issuer_cat_id = $1 OR receiver_cat_id = $2)", catID, catID).
+		Scan(
+			&res.ID,
+			&res.IssuerUserID,
+			&res.IssuerCatID,
+			&res.ReceiverUserID,
+			&res.ReceiverCatID,
+			&res.Message,
+			&res.IsApproved,
+			&res.CreatedAt,
+			&res.UpdatedAt,
+		); err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}

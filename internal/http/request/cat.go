@@ -36,4 +36,5 @@ type UpdateCat struct {
 	Description string           `json:"description" validate:"required,min=1,max=200"`
 	ImageURLs   []string         `json:"imageUrls" validate:"required,required,gt=0,dive,url"`
 	CatID       uuid.UUID        `json:"-"`
+	UserID      uuid.UUID        `json:"-"`
 }

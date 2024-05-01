@@ -85,25 +85,24 @@ func (u *Usecase) UpdateCat(c *fiber.Ctx, req *request.UpdateCat) error {
 		return err
 	}
 
-	userID, err := uuid.Parse(util.GetUserIDFromHeader(c))
+	err = u.repo.CheckOwnCat(req.UserID, req.CatID)
 	if err != nil {
 		return err
 	}
 
-	err = u.repo.CheckOwnCat(userID, req.CatID)
-	if err != nil {
+	cm, err := u.repo.FindOneCatMatchByCatID(req.CatID)
+	if err != nil && !repository.IsRecordNotFound(err) {
 		return err
 	}
 
-	// todo: check if cat has match requests on cat_matches
-	// if cat.Sex != req.Sex && cat.HasMatched {
-	// 	err = custom_error.SetCustomError(&custom_error.ErrorContext{
-	// 		HTTPCode: http.StatusBadRequest,
-	// 		Message:  "cannot change cat's sex because cat is already matched",
-	// 	})
+	if cm != nil && req.Sex != cat.Sex {
+		err = custom_error.SetCustomError(&custom_error.ErrorContext{
+			HTTPCode: http.StatusBadRequest,
+			Message:  "cannot change cat's sex because your cat's match request has been issued",
+		})
 
-	// 	return err
-	// }
+		return err
+	}
 
 	data := map[string]interface{}{
 		"name":         req.Name,

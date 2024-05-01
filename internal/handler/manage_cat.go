@@ -66,6 +66,11 @@ func (h *Handler) UpdateCat(c *fiber.Ctx) error {
 		return response.Error(c, err)
 	}
 
+	req.UserID, err = uuid.Parse(util.GetUserIDFromHeader(c))
+	if err != nil {
+		return response.Error(c, err)
+	}
+
 	err = h.uc.UpdateCat(c, &req)
 	if err != nil {
 		return response.Error(c, err)
