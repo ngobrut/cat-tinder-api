@@ -210,8 +210,8 @@ func (r *Repository) CheckOwnCat(userID uuid.UUID, catID uuid.UUID) error {
 
 	if cnt == 0 {
 		err = custom_error.SetCustomError(&custom_error.ErrorContext{
-			HTTPCode: http.StatusUnauthorized,
-			Message:  constant.ErrorMessageMap[http.StatusUnauthorized],
+			HTTPCode: http.StatusNotFound,
+			Message:  constant.ErrorMessageMap[http.StatusNotFound],
 		})
 
 		return err
