@@ -2,6 +2,7 @@ package repository
 
 import (
 	"github.com/google/uuid"
+	"github.com/ngobrut/cat-tinder-api/internal/http/request"
 	"github.com/ngobrut/cat-tinder-api/internal/model"
 )
 
@@ -13,4 +14,9 @@ type IFaceRepository interface {
 
 	// cat
 	CreateCat(data *model.Cat) error
+	FindCat(params *request.ListCatQuery) ([]*model.Cat, error)
+	FindOneCatByID(catID uuid.UUID) (*model.Cat, error)
+	CheckOwnCat(userID uuid.UUID, catID uuid.UUID) error
+	UpdateCatByID(data map[string]interface{}, catID uuid.UUID) error
+	DeleteCatByID(catID uuid.UUID) error
 }
