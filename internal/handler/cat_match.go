@@ -32,10 +32,16 @@ func (h *Handler) CreateCatMatch(c *fiber.Ctx) error {
 }
 
 func (h *Handler) GetListCatMatch(c *fiber.Ctx) error {
-	var req request.ListCatMatchQuery
-	req.UserID, _ = uuid.Parse(util.GetUserIDFromHeader(c))
+	userID, err := uuid.Parse(util.GetUserIDFromHeader(c))
+	if err != nil {
+		return response.Error(c, err)
+	}
 
-	res, err := h.uc.GetListCatMatch(&req)
+	params := &request.ListCatMatchQuery{
+		UserID: userID,
+	}
+
+	res, err := h.uc.GetListCatMatch(params)
 	if err != nil {
 		return response.Error(c, err)
 	}
