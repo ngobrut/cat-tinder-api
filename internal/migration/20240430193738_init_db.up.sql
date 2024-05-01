@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS cat_matches(
     is_approved boolean default null,
     created_at timestamp default now(),
     updated_at timestamp default now(),
+    deleted_at timestamp default null,
     constraint cat_matches_issuer_id_fk foreign key (issuer_user_id) references users(user_id),
     constraint cat_matches_issuer_cat_id_fk foreign key (issuer_cat_id) references cats(cat_id),
     constraint cat_matches_receiver_id_fk foreign key (receiver_user_id) references users(user_id),
