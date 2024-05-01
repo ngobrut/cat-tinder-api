@@ -17,5 +17,5 @@ var ErrorMessageMap = map[int]string{
 	http.StatusUnauthorized:        "you are not authorized to access this api",
 	http.StatusConflict:            "duplicated data error",
 	http.StatusUnprocessableEntity: "please check your body request",
-	http.StatusBadRequest:          "request doesn’t pass validation",
+	http.StatusBadRequest:          "request doesn't pass validation",
 }
