@@ -26,6 +26,12 @@ func NewDBClient(cnf *config.Config) (*sql.DB, error) {
 		return nil, err
 	}
 
+	err = db.Ping()
+	if err != nil {
+		log.Println("[failed-postgres-connection]", err)
+		return nil, err
+	}
+
 	log.Println("connected to postgres")
 
 	return db, nil
