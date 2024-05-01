@@ -19,4 +19,8 @@ type IFaceRepository interface {
 	CheckOwnCat(userID uuid.UUID, catID uuid.UUID) error
 	UpdateCatByID(data map[string]interface{}, catID uuid.UUID) error
 	DeleteCatByID(catID uuid.UUID) error
+
+	// cat match
+	CreateCatMatch(data *model.CatMatch) error
+	CheckDuplicateMatchRequest(issuerCatID uuid.UUID, receiverCatID uuid.UUID) error
 }
