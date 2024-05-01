@@ -2,10 +2,13 @@ package usecase
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 	"github.com/ngobrut/cat-tinder-api/internal/http/request"
 	"github.com/ngobrut/cat-tinder-api/internal/http/response"
+	"github.com/ngobrut/cat-tinder-api/internal/model"
 	"github.com/ngobrut/cat-tinder-api/internal/repository"
 	"github.com/ngobrut/cat-tinder-api/pkg/custom_error"
 )
@@ -90,21 +93,21 @@ func (u *Usecase) CreateCatMatch(c *fiber.Ctx, req *request.CreateCatMatch) erro
 		return err
 	}
 
-	// data := &model.CatMatch{
-	// 	ID:             uuid.New(),
-	// 	IssuerUserID:   issuerCat.UserID,
-	// 	IssuerCatID:    issuerCat.CatID,
-	// 	ReceiverUserID: receiverCat.UserID,
-	// 	ReceiverCatID:  receiverCat.CatID,
-	// 	Message:        req.Message,
-	// 	CreatedAt:      time.Now(),
-	// 	UpdatedAt:      time.Now(),
-	// }
+	data := &model.CatMatch{
+		ID:             uuid.New(),
+		IssuerUserID:   issuerCat.UserID,
+		IssuerCatID:    issuerCat.CatID,
+		ReceiverUserID: receiverCat.UserID,
+		ReceiverCatID:  receiverCat.CatID,
+		Message:        req.Message,
+		CreatedAt:      time.Now(),
+		UpdatedAt:      time.Now(),
+	}
 
-	// err = u.repo.CreateCatMatch(data)
-	// if err != nil {
-	// 	return err
-	// }
+	err = u.repo.CreateCatMatch(data)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
