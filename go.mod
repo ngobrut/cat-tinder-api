@@ -1,6 +1,6 @@
 module github.com/ngobrut/cat-tinder-api
 
-go 1.22.2
+go 1.20.2
 
 require (
 	github.com/go-playground/locales v0.14.1
