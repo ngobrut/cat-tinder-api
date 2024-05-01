@@ -63,7 +63,7 @@ func (h *Handler) ApproveCatMatch(c *fiber.Ctx) error {
 
 	err = h.uc.ApproveCatMatch(c, &req)
 	if err != nil {
-		return err
+		return response.Error(c, err)
 	}
 
 	return response.OK(c, nil, http.StatusOK, "successfully matches the cat match request")
@@ -86,7 +86,7 @@ func (h *Handler) RejectCatMatch(c *fiber.Ctx) error {
 		return response.Error(c, err)
 	}
 
-	return response.OK(c, nil, http.StatusOK, "Cat match request rejected successfully")
+	return response.OK(c, nil, http.StatusOK, "successfully reject the cat match request")
 }
 
 func (h *Handler) DeleteCatMatch(c *fiber.Ctx) error {

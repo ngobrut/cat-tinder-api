@@ -166,9 +166,8 @@ func (r *Repository) FindCatMatch(params *request.ListCatMatchQuery) ([]*respons
 // FindOneCatMatchByID implements IFaceRepository.
 func (r *Repository) FindOneCatMatchByID(ID uuid.UUID) (*model.CatMatch, error) {
 	res := &model.CatMatch{}
-
-	if err := r.db.
-		QueryRow("SELECT * FROM cat_matches WHERE id = $1 AND deleted_at IS NULL", ID).
+	err := r.db.
+		QueryRow("SELECT * FROM cat_matches WHERE id = $1", ID).
 		Scan(
 			&res.ID,
 			&res.IssuerUserID,
@@ -180,7 +179,8 @@ func (r *Repository) FindOneCatMatchByID(ID uuid.UUID) (*model.CatMatch, error) 
 			&res.CreatedAt,
 			&res.UpdatedAt,
 			&res.DeletedAt,
-		); err != nil {
+		)
+	if err != nil {
 		return nil, err
 	}
 
@@ -191,7 +191,7 @@ func (r *Repository) ApproveCatMatch(matchID uuid.UUID) error {
 	var issuerCatID uuid.UUID
 	var receiverCatID uuid.UUID
 	err := r.db.
-		QueryRow("UPDATE cat_matches SET is_approved = true WHERE match_id = $1 returning issuer_cat_id, receiver_cat_id", matchID).
+		QueryRow("UPDATE cat_matches SET is_approved = true WHERE id = $1 returning issuer_cat_id, receiver_cat_id", matchID).
 		Scan(
 			&issuerCatID,
 			&receiverCatID,
@@ -200,11 +200,24 @@ func (r *Repository) ApproveCatMatch(matchID uuid.UUID) error {
 		return err
 	}
 
-	_, err = r.db.Exec("UPDATE cat_matches SET deleted_at = $1 WHERE issuer_cat_id in ($2, $3) or receiver_cat_id in ($2, $3) ", time.Now().Format("2006-01-02 15:04:05"), issuerCatID, receiverCatID)
+	_, err = r.db.Exec("UPDATE cat_matches SET deleted_at = $1 WHERE (issuer_cat_id in ($2, $3) or receiver_cat_id in ($2, $3)) AND NOT id = $4 ", time.Now().Format("2006-01-02 15:04:05"), issuerCatID, receiverCatID, matchID)
 	if err != nil {
 		return err
 	}
 
+	_, err = r.db.Exec("UPDATE cats SET has_matched = true WHERE cat_id in ($1, $2)  ", issuerCatID, receiverCatID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *Repository) RejectCatMatch(matchID uuid.UUID) error {
+	_, err := r.db.Exec("UPDATE cat_matches SET is_approved = false WHERE id = $1 ", matchID)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

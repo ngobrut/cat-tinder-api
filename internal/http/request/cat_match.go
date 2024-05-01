@@ -19,6 +19,6 @@ type RejectCatMatch struct {
 }
 
 type ApproveCatMatch struct {
-	MatchID uuid.UUID `json:"matchId" validate:"required"`
+	MatchID uuid.UUID `json:"matchId"`
 	UserId  uuid.UUID `json:"-"`
 }

@@ -26,6 +26,7 @@ type IFaceRepository interface {
 	CheckDuplicateMatchRequest(issuerCatID uuid.UUID, receiverCatID uuid.UUID) error
 	FindOneCatMatchByCatID(catID uuid.UUID) (*model.CatMatch, error)
 	ApproveCatMatch(matchID uuid.UUID) error
+	RejectCatMatch(matchID uuid.UUID) error
 	FindCatMatch(params *request.ListCatMatchQuery) ([]*response.CatMatchResponse, error)
 	FindOneCatMatchByID(ID uuid.UUID) (*model.CatMatch, error)
 	UpdateCatMatchByID(data map[string]interface{}, ID uuid.UUID) error

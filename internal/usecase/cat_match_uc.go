@@ -133,24 +133,23 @@ func (u *Usecase) ApproveCatMatch(c *fiber.Ctx, req *request.ApproveCatMatch) er
 			HTTPCode: http.StatusNotFound,
 			Message:  "matchId is not found",
 		})
-
 		return err
 	}
 
-	if req.UserId == catMatch.ReceiverUserID {
+	if req.UserId != catMatch.ReceiverUserID {
 		err = custom_error.SetCustomError(&custom_error.ErrorContext{
 			HTTPCode: http.StatusNotFound,
 			Message:  "matchId is not found",
 		})
+		return err
 	}
-
-	if catMatch.IsApproved != nil && catMatch.DeletedAt != nil {
+	if catMatch.IsApproved != nil || catMatch.DeletedAt != nil {
 		err = custom_error.SetCustomError(&custom_error.ErrorContext{
 			HTTPCode: http.StatusBadRequest,
 			Message:  "matchId is no longer valid",
 		})
+		return err
 	}
-
 	err = u.repo.ApproveCatMatch(req.MatchID)
 	if err != nil {
 		return err
@@ -162,50 +161,36 @@ func (u *Usecase) ApproveCatMatch(c *fiber.Ctx, req *request.ApproveCatMatch) er
 // RejectCatMatch implements IFaceUsecase.
 func (u *Usecase) RejectCatMatch(c *fiber.Ctx, req *request.RejectCatMatch) error {
 	cm, err := u.repo.FindOneCatMatchByID(req.MatchID)
-	if err != nil && !repository.IsRecordNotFound(err) {
-		return err
-	}
-
-	if cm == nil {
+	if err != nil {
 		err = custom_error.SetCustomError(&custom_error.ErrorContext{
 			HTTPCode: http.StatusNotFound,
-			Message:  "match request not found",
+			Message:  "matchId is not found",
 		})
-
 		return err
 	}
 
-	if cm.ReceiverUserID != req.UserID {
+	if req.UserID != cm.ReceiverUserID {
 		err = custom_error.SetCustomError(&custom_error.ErrorContext{
 			HTTPCode: http.StatusUnauthorized,
-			Message:  "only receiver could reject this cat match request",
+			Message:  "matchId is not found",
 		})
-
 		return err
 	}
 
-	if cm.IsApproved != nil {
-		if *cm.IsApproved {
-			err = custom_error.SetCustomError(&custom_error.ErrorContext{
-				HTTPCode: http.StatusBadRequest,
-				Message:  "this match request was approved",
-			})
-		} else {
-			err = custom_error.SetCustomError(&custom_error.ErrorContext{
-				HTTPCode: http.StatusBadRequest,
-				Message:  "this match request was rejected",
-			})
-		}
-
+	if cm.IsApproved != nil || cm.DeletedAt != nil {
+		err = custom_error.SetCustomError(&custom_error.ErrorContext{
+			HTTPCode: http.StatusBadRequest,
+			Message:  "matchId is no longer valid",
+		})
 		return err
 	}
 
-	var approved bool
-	data := map[string]interface{}{
-		"is_approved": &approved,
+	err = u.repo.RejectCatMatch(req.MatchID)
+	if err != nil {
+		return err
 	}
 
-	return u.repo.UpdateCatMatchByID(data, cm.ID)
+	return nil
 }
 
 // DeleteCatMatch implements IFaceUsecase.
