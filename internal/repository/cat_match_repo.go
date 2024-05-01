@@ -223,3 +223,13 @@ func (r *Repository) UpdateCatMatchByID(data map[string]interface{}, ID uuid.UUI
 
 	return nil
 }
+
+// DeleteCatMatchByID implements IFaceRepository.
+func (r *Repository) DeleteCatMatchByID(ID uuid.UUID) error {
+	_, err := r.db.Exec("UPDATE cat_matches SET deleted_at = $1 WHERE id = $2", time.Now().Format("2006-01-02 15:04:05"), ID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -198,7 +198,7 @@ func (r *Repository) FindOneCatByID(catID uuid.UUID) (*model.Cat, error) {
 	return res, nil
 }
 
-// CheckIfOwnCat implement IFaceRepository
+// CheckOwnCat implement IFaceRepository
 func (r *Repository) CheckOwnCat(userID uuid.UUID, catID uuid.UUID) error {
 	var cnt int
 

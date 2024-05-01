@@ -27,4 +27,5 @@ type IFaceRepository interface {
 	FindCatMatch(params *request.ListCatMatchQuery) ([]*model.CatMatch, error)
 	FindOneCatMatchByID(ID uuid.UUID) (*model.CatMatch, error)
 	UpdateCatMatchByID(data map[string]interface{}, ID uuid.UUID) error
+	DeleteCatMatchByID(ID uuid.UUID) error
 }

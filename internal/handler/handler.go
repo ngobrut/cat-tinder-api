@@ -64,6 +64,7 @@ func InitHTTPHandler(cnf *config.Config, uc usecase.IFaceUsecase) *fiber.App {
 	catMatch.Post("/", h.CreateCatMatch)
 	catMatch.Get("/", h.GetListCatMatch)
 	catMatch.Post("/reject", h.RejectCatMatch)
+	catMatch.Delete("/:id", h.DeleteCatMatch)
 
 	return app
 }

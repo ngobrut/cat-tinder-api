@@ -28,7 +28,7 @@ func (h *Handler) CreateCatMatch(c *fiber.Ctx) error {
 		return response.Error(c, err)
 	}
 
-	return response.OK(c, nil, http.StatusCreated, "Success")
+	return response.OK(c, nil, http.StatusCreated, "Cat match request created successfully")
 }
 
 func (h *Handler) GetListCatMatch(c *fiber.Ctx) error {
@@ -67,4 +67,18 @@ func (h *Handler) RejectCatMatch(c *fiber.Ctx) error {
 	}
 
 	return response.OK(c, nil, http.StatusOK, "Cat match request rejected successfully")
+}
+
+func (h *Handler) DeleteCatMatch(c *fiber.Ctx) error {
+	ID, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return response.Error(c, err)
+	}
+
+	err = h.uc.DeleteCatMatch(c, ID)
+	if err != nil {
+		return response.Error(c, err)
+	}
+
+	return response.OK(c, nil, http.StatusOK, "Cat match request deleted successfully")
 }

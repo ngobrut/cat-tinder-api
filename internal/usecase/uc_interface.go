@@ -23,4 +23,5 @@ type IFaceUsecase interface {
 	CreateCatMatch(c *fiber.Ctx, req *request.CreateCatMatch) error
 	GetListCatMatch(params *request.ListCatMatchQuery) ([]*response.CatMatchResponse, error)
 	RejectCatMatch(c *fiber.Ctx, req *request.RejectCatMatch) error
+	DeleteCatMatch(c *fiber.Ctx, ID uuid.UUID) error
 }
