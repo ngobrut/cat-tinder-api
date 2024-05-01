@@ -158,3 +158,52 @@ func (u *Usecase) GetListCatMatch(params *request.ListCatMatchQuery) ([]*respons
 
 	return res, nil
 }
+
+// RejectCatMatch implements IFaceUsecase.
+func (u *Usecase) RejectCatMatch(c *fiber.Ctx, req *request.RejectCatMatch) error {
+	cm, err := u.repo.FindOneCatMatchByID(req.MatchID)
+	if err != nil && !repository.IsRecordNotFound(err) {
+		return err
+	}
+
+	if cm == nil {
+		err = custom_error.SetCustomError(&custom_error.ErrorContext{
+			HTTPCode: http.StatusNotFound,
+			Message:  "match request not found",
+		})
+
+		return err
+	}
+
+	if cm.ReceiverUserID != req.UserID {
+		err = custom_error.SetCustomError(&custom_error.ErrorContext{
+			HTTPCode: http.StatusUnauthorized,
+			Message:  "only receiver could reject this cat match request",
+		})
+
+		return err
+	}
+
+	if cm.IsApproved != nil {
+		if *cm.IsApproved {
+			err = custom_error.SetCustomError(&custom_error.ErrorContext{
+				HTTPCode: http.StatusBadRequest,
+				Message:  "this match request was approved",
+			})
+		} else {
+			err = custom_error.SetCustomError(&custom_error.ErrorContext{
+				HTTPCode: http.StatusBadRequest,
+				Message:  "this match request was rejected",
+			})
+		}
+
+		return err
+	}
+
+	var approved bool
+	data := map[string]interface{}{
+		"is_approved": &approved,
+	}
+
+	return u.repo.UpdateCatMatchByID(data, cm.ID)
+}

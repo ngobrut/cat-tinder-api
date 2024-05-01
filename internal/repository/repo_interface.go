@@ -23,6 +23,8 @@ type IFaceRepository interface {
 	// cat match
 	CreateCatMatch(data *model.CatMatch) error
 	CheckDuplicateMatchRequest(issuerCatID uuid.UUID, receiverCatID uuid.UUID) error
-	FindCatMatch(params *request.ListCatMatchQuery) ([]*model.CatMatch, error)
 	FindOneCatMatchByCatID(catID uuid.UUID) (*model.CatMatch, error)
+	FindCatMatch(params *request.ListCatMatchQuery) ([]*model.CatMatch, error)
+	FindOneCatMatchByID(ID uuid.UUID) (*model.CatMatch, error)
+	UpdateCatMatchByID(data map[string]interface{}, ID uuid.UUID) error
 }

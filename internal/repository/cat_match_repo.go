@@ -1,7 +1,10 @@
 package repository
 
 import (
+	"fmt"
 	"net/http"
+	"strings"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/lib/pq"
@@ -36,7 +39,7 @@ func (r *Repository) CheckDuplicateMatchRequest(issuerCatID uuid.UUID, receiverC
 	var cnt int
 
 	if err := r.db.
-		QueryRow("SELECT COUNT(*) FROM cat_matches WHERE issuer_cat_id = $1 AND receiver_cat_id = $2", issuerCatID, receiverCatID).
+		QueryRow("SELECT COUNT(*) FROM cat_matches WHERE issuer_cat_id = $1 AND receiver_cat_id = $2 AND deleted_at iS NULL", issuerCatID, receiverCatID).
 		Scan(&cnt); err != nil {
 		return err
 	}
@@ -53,11 +56,35 @@ func (r *Repository) CheckDuplicateMatchRequest(issuerCatID uuid.UUID, receiverC
 	return nil
 }
 
+// FindOneCatMatchByCatID implements IFaceRepository.
+func (r *Repository) FindOneCatMatchByCatID(catID uuid.UUID) (*model.CatMatch, error) {
+	res := &model.CatMatch{}
+
+	if err := r.db.
+		QueryRow("SELECT * FROM cat_matches WHERE (issuer_cat_id = $1 OR receiver_cat_id = $2) AND deleted_at IS NULL", catID, catID).
+		Scan(
+			&res.ID,
+			&res.IssuerUserID,
+			&res.IssuerCatID,
+			&res.ReceiverUserID,
+			&res.ReceiverCatID,
+			&res.Message,
+			&res.IsApproved,
+			&res.CreatedAt,
+			&res.UpdatedAt,
+			&res.DeletedAt,
+		); err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
 // FindCatMatch implements IFaceRepository.
 func (r *Repository) FindCatMatch(params *request.ListCatMatchQuery) ([]*model.CatMatch, error) {
 	var res = make([]*model.CatMatch, 0)
 
-	rows, err := r.db.Query("SELECT * FROM cat_matches WHERE (issuer_user_id = $1 OR receiver_user_id = $2) ORDER BY created_at DESC", params.UserID, params.UserID)
+	rows, err := r.db.Query("SELECT * FROM cat_matches WHERE (issuer_user_id = $1 OR receiver_user_id = $2) AND deleted_at IS NULL ORDER BY created_at DESC", params.UserID, params.UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -74,6 +101,7 @@ func (r *Repository) FindCatMatch(params *request.ListCatMatchQuery) ([]*model.C
 			&cm.IsApproved,
 			&cm.CreatedAt,
 			&cm.UpdatedAt,
+			&cm.DeletedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -143,12 +171,12 @@ func (r *Repository) FindCatMatch(params *request.ListCatMatchQuery) ([]*model.C
 	return res, nil
 }
 
-// FindOneCatMatchByCatID implements IFaceRepository.
-func (r *Repository) FindOneCatMatchByCatID(catID uuid.UUID) (*model.CatMatch, error) {
+// FindOneCatMatchByID implements IFaceRepository.
+func (r *Repository) FindOneCatMatchByID(ID uuid.UUID) (*model.CatMatch, error) {
 	res := &model.CatMatch{}
 
 	if err := r.db.
-		QueryRow("SELECT * FROM cat_matches WHERE (issuer_cat_id = $1 OR receiver_cat_id = $2)", catID, catID).
+		QueryRow("SELECT * FROM cat_matches WHERE id = $1 AND deleted_at IS NULL", ID).
 		Scan(
 			&res.ID,
 			&res.IssuerUserID,
@@ -159,9 +187,39 @@ func (r *Repository) FindOneCatMatchByCatID(catID uuid.UUID) (*model.CatMatch, e
 			&res.IsApproved,
 			&res.CreatedAt,
 			&res.UpdatedAt,
+			&res.DeletedAt,
 		); err != nil {
 		return nil, err
 	}
 
 	return res, nil
+}
+
+// UpdateCatMatchByID implements IFaceRepository.
+func (r *Repository) UpdateCatMatchByID(data map[string]interface{}, ID uuid.UUID) error {
+	var clause = make([]string, 0)
+	var args = make([]interface{}, 0)
+	var counter int = 1
+
+	for k, v := range data {
+		clause = append(clause, fmt.Sprintf("%s = $%d", k, counter))
+		args = append(args, v)
+		counter++
+	}
+
+	query := `UPDATE cat_matches SET `
+
+	if len(clause) > 0 {
+		query += strings.Join(clause, ", ")
+	}
+
+	query += fmt.Sprintf(" WHERE id = $%d", counter)
+	args = append(args, ID)
+
+	_, err := r.db.Exec(query, args...)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
