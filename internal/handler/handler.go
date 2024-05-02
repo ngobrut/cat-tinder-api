@@ -45,7 +45,7 @@ func InitHTTPHandler(cnf *config.Config, uc usecase.IFaceUsecase) *fiber.App {
 		})
 	})
 
-	api := app.Group("/api/v1")
+	api := app.Group("/v1")
 
 	user := api.Group("/user")
 	user.Post("/register", h.Register)
