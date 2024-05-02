@@ -1,8 +1,9 @@
-package app
+package main
 
 import (
-	"github.com/ngobrut/cat-tinder-api/config"
+	"log"
 
+	"github.com/ngobrut/cat-tinder-api/config"
 	"github.com/ngobrut/cat-tinder-api/internal/handler"
 	"github.com/ngobrut/cat-tinder-api/internal/repository"
 	"github.com/ngobrut/cat-tinder-api/internal/usecase"
@@ -27,4 +28,11 @@ func Exec() error {
 	}
 
 	return nil
+}
+
+func main() {
+	err := Exec()
+	if err != nil {
+		log.Fatalf("[app-run-failed] \n%v\n", err)
+	}
 }
