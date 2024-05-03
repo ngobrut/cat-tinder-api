@@ -75,11 +75,18 @@ func (r *Repository) FindCat(params *request.ListCatQuery) ([]*model.Cat, error)
 		}
 
 		if params.AgeInMonth != "" {
-			operator := params.AgeInMonth[0]
+			allowed := map[string]bool{
+				">": true,
+				"<": true,
+				"=": true,
+			}
 
-			clause = append(clause, fmt.Sprintf(" age_in_month %s $%d", string(operator), counter))
-			args = append(args, params.AgeInMonth[1:])
-			counter++
+			operator := params.AgeInMonth[0]
+			if allowed[string(operator)] {
+				clause = append(clause, fmt.Sprintf(" age_in_month %s $%d", string(operator), counter))
+				args = append(args, params.AgeInMonth[1:])
+				counter++
+			}
 		}
 
 		if params.Owned != "" {
