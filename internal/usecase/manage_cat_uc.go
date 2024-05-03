@@ -71,7 +71,7 @@ func (u *Usecase) GetListCat(params *request.ListCatQuery) ([]*response.CatRespo
 
 // UpdateCat implements IFaceUsecase.
 func (u *Usecase) UpdateCat(c *fiber.Ctx, req *request.UpdateCat) error {
-	cat, err := u.repo.FindOneCatByID(req.CatID)
+	cat, err := u.repo.FindOneCatByID(req.CatID.String())
 	if err != nil && !repository.IsRecordNotFound(err) {
 		return err
 	}
@@ -124,7 +124,7 @@ func (u *Usecase) UpdateCat(c *fiber.Ctx, req *request.UpdateCat) error {
 
 // DeleteCat implements IFaceUsecase.
 func (u *Usecase) DeleteCat(c *fiber.Ctx, catID uuid.UUID) error {
-	cat, err := u.repo.FindOneCatByID(catID)
+	cat, err := u.repo.FindOneCatByID(catID.String())
 	if err != nil && !repository.IsRecordNotFound(err) {
 		return err
 	}

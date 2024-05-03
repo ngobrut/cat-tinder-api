@@ -9,7 +9,6 @@ import (
 	"github.com/ngobrut/cat-tinder-api/internal/http/request"
 	"github.com/ngobrut/cat-tinder-api/internal/http/response"
 	"github.com/ngobrut/cat-tinder-api/internal/model"
-	"github.com/ngobrut/cat-tinder-api/internal/repository"
 	"github.com/ngobrut/cat-tinder-api/pkg/custom_error"
 	"github.com/ngobrut/cat-tinder-api/pkg/util"
 )
@@ -17,7 +16,11 @@ import (
 // CreateCatMatch implements IFaceUsecase.
 func (u *Usecase) CreateCatMatch(c *fiber.Ctx, req *request.CreateCatMatch) error {
 	issuerCat, err := u.repo.FindOneCatByID(req.UserCatID)
-	if err != nil && !repository.IsRecordNotFound(err) {
+	if err != nil {
+		err = custom_error.SetCustomError(&custom_error.ErrorContext{
+			HTTPCode: http.StatusNotFound,
+			Message:  "id is not found",
+		})
 		return err
 	}
 
@@ -32,7 +35,7 @@ func (u *Usecase) CreateCatMatch(c *fiber.Ctx, req *request.CreateCatMatch) erro
 
 	if issuerCat.UserID != req.UserID {
 		err = custom_error.SetCustomError(&custom_error.ErrorContext{
-			HTTPCode: http.StatusUnauthorized,
+			HTTPCode: http.StatusNotFound,
 			Message:  "cannot issue a match request because this isn't your cat",
 		})
 
@@ -40,7 +43,11 @@ func (u *Usecase) CreateCatMatch(c *fiber.Ctx, req *request.CreateCatMatch) erro
 	}
 
 	receiverCat, err := u.repo.FindOneCatByID(req.MatchCatID)
-	if err != nil && !repository.IsRecordNotFound(err) {
+	if err != nil {
+		err = custom_error.SetCustomError(&custom_error.ErrorContext{
+			HTTPCode: http.StatusNotFound,
+			Message:  "id is not found",
+		})
 		return err
 	}
 

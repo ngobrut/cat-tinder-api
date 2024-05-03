@@ -173,7 +173,7 @@ func (r *Repository) FindCat(params *request.ListCatQuery) ([]*model.Cat, error)
 }
 
 // FindOneCatByID implements IFaceRepository.
-func (r *Repository) FindOneCatByID(catID uuid.UUID) (*model.Cat, error) {
+func (r *Repository) FindOneCatByID(catID string) (*model.Cat, error) {
 	res := &model.Cat{}
 
 	if err := r.db.
