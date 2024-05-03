@@ -75,18 +75,10 @@ func (r *Repository) FindCat(params *request.ListCatQuery) ([]*model.Cat, error)
 		}
 
 		if params.AgeInMonth != "" {
-			switch params.AgeInMonth {
-			case ">4":
-				clause = append(clause, fmt.Sprintf(" age_in_month > $%d", counter))
-				args = append(args, 4)
-			case "<4":
-				clause = append(clause, fmt.Sprintf(" age_in_month < $%d", counter))
-				args = append(args, 4)
-			default:
-				clause = append(clause, fmt.Sprintf(" age_in_month = $%d", counter))
-				args = append(args, params.AgeInMonth)
-			}
+			operator := params.AgeInMonth[0]
 
+			clause = append(clause, fmt.Sprintf(" age_in_month %s $%d", string(operator), counter))
+			args = append(args, params.AgeInMonth[1:])
 			counter++
 		}
 
