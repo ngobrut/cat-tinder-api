@@ -16,6 +16,20 @@ import (
 
 // Register implements IFaceUsecase.
 func (u *Usecase) Register(req *request.Register) (*response.Register, error) {
+	existing, err := u.repo.FindOneUserByEmail(req.Email)
+	if err != nil && !repository.IsRecordNotFound(err) {
+		return nil, err
+	}
+
+	if existing != nil {
+		err = custom_error.SetCustomError(&custom_error.ErrorContext{
+			HTTPCode: http.StatusConflict,
+			Message:  "email has been used",
+		})
+
+		return nil, err
+	}
+
 	pwd, err := hash.HashAndSalt(u.cnf.BcryptSalt, []byte(req.Password))
 	if err != nil {
 		return nil, err
