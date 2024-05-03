@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/ngobrut/cat-tinder-api/internal/http/request"
 	"github.com/ngobrut/cat-tinder-api/internal/http/response"
+	"github.com/ngobrut/cat-tinder-api/pkg/custom_error"
 	"github.com/ngobrut/cat-tinder-api/pkg/custom_validator"
 	"github.com/ngobrut/cat-tinder-api/pkg/util"
 )
@@ -44,6 +45,10 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 func (h *Handler) GetProfile(c *fiber.Ctx) error {
 	userID, err := uuid.Parse(util.GetUserIDFromHeader(c))
 	if err != nil {
+		err = custom_error.SetCustomError(&custom_error.ErrorContext{
+			HTTPCode: http.StatusNotFound,
+			Message:  "id is not found",
+		})
 		return response.Error(c, err)
 	}
 

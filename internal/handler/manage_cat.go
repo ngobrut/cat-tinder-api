@@ -8,6 +8,7 @@ import (
 	"github.com/ngobrut/cat-tinder-api/internal/http/request"
 
 	"github.com/ngobrut/cat-tinder-api/internal/http/response"
+	"github.com/ngobrut/cat-tinder-api/pkg/custom_error"
 	"github.com/ngobrut/cat-tinder-api/pkg/custom_validator"
 	"github.com/ngobrut/cat-tinder-api/pkg/util"
 )
@@ -63,6 +64,10 @@ func (h *Handler) UpdateCat(c *fiber.Ctx) error {
 
 	req.CatID, err = uuid.Parse(c.Params("id"))
 	if err != nil {
+		err = custom_error.SetCustomError(&custom_error.ErrorContext{
+			HTTPCode: http.StatusNotFound,
+			Message:  "matchId is not found",
+		})
 		return response.Error(c, err)
 	}
 
@@ -82,6 +87,10 @@ func (h *Handler) UpdateCat(c *fiber.Ctx) error {
 func (h *Handler) DeleteCat(c *fiber.Ctx) error {
 	catID, err := uuid.Parse(c.Params("id"))
 	if err != nil {
+		err = custom_error.SetCustomError(&custom_error.ErrorContext{
+			HTTPCode: http.StatusNotFound,
+			Message:  "matchId is not found",
+		})
 		return response.Error(c, err)
 	}
 

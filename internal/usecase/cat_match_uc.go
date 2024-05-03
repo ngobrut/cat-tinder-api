@@ -196,14 +196,18 @@ func (u *Usecase) RejectCatMatch(c *fiber.Ctx, req *request.RejectCatMatch) erro
 // DeleteCatMatch implements IFaceUsecase.
 func (u *Usecase) DeleteCatMatch(c *fiber.Ctx, ID uuid.UUID) error {
 	cm, err := u.repo.FindOneCatMatchByID(ID)
-	if err != nil && !repository.IsRecordNotFound(err) {
+	if err != nil {
+		err = custom_error.SetCustomError(&custom_error.ErrorContext{
+			HTTPCode: http.StatusNotFound,
+			Message:  "matchId is not found",
+		})
 		return err
 	}
 
 	if cm == nil {
 		err = custom_error.SetCustomError(&custom_error.ErrorContext{
 			HTTPCode: http.StatusNotFound,
-			Message:  "match request not found",
+			Message:  "matchId is not found",
 		})
 
 		return err
