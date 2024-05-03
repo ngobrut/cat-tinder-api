@@ -26,12 +26,12 @@ func InitHTTPHandler(cnf *config.Config, uc usecase.IFaceUsecase) *fiber.App {
 		JWTSecret: cnf.JWTSecret,
 	}
 
-	app := fiber.New(fiber.Config{
-		BodyLimit: 50 * 1024 * 1024,
-	})
-
+	app := fiber.New()
 	app.Use(cors.New())
-	app.Use(logger.New())
+	app.Use(logger.New(logger.Config{
+		Format: "[${time}] ${status} | ${method} | ${url}\n",
+	}))
+
 	app.Use(recover.New(recover.Config{
 		EnableStackTrace: true,
 	}))

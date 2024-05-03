@@ -140,6 +140,7 @@ func (u *Usecase) ApproveCatMatch(c *fiber.Ctx, req *request.ApproveCatMatch) er
 			HTTPCode: http.StatusNotFound,
 			Message:  "matchId is not found",
 		})
+
 		return err
 	}
 
@@ -148,15 +149,19 @@ func (u *Usecase) ApproveCatMatch(c *fiber.Ctx, req *request.ApproveCatMatch) er
 			HTTPCode: http.StatusNotFound,
 			Message:  "matchId is not found",
 		})
+
 		return err
 	}
+
 	if catMatch.IsApproved != nil || catMatch.DeletedAt != nil {
 		err = custom_error.SetCustomError(&custom_error.ErrorContext{
 			HTTPCode: http.StatusBadRequest,
 			Message:  "matchId is no longer valid",
 		})
+
 		return err
 	}
+
 	err = u.repo.ApproveCatMatch(req.MatchID)
 	if err != nil {
 		return err
@@ -173,6 +178,7 @@ func (u *Usecase) RejectCatMatch(c *fiber.Ctx, req *request.RejectCatMatch) erro
 			HTTPCode: http.StatusNotFound,
 			Message:  "matchId is not found",
 		})
+
 		return err
 	}
 
@@ -181,6 +187,7 @@ func (u *Usecase) RejectCatMatch(c *fiber.Ctx, req *request.RejectCatMatch) erro
 			HTTPCode: http.StatusUnauthorized,
 			Message:  "matchId is not found",
 		})
+
 		return err
 	}
 
@@ -189,6 +196,7 @@ func (u *Usecase) RejectCatMatch(c *fiber.Ctx, req *request.RejectCatMatch) erro
 			HTTPCode: http.StatusBadRequest,
 			Message:  "matchId is no longer valid",
 		})
+
 		return err
 	}
 
