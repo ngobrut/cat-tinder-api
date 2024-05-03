@@ -68,6 +68,7 @@ func (h *Handler) UpdateCat(c *fiber.Ctx) error {
 			HTTPCode: http.StatusNotFound,
 			Message:  "matchId is not found",
 		})
+
 		return response.Error(c, err)
 	}
 
@@ -91,6 +92,7 @@ func (h *Handler) DeleteCat(c *fiber.Ctx) error {
 			HTTPCode: http.StatusNotFound,
 			Message:  "matchId is not found",
 		})
+
 		return response.Error(c, err)
 	}
 

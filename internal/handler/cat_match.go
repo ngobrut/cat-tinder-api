@@ -19,6 +19,26 @@ func (h *Handler) CreateCatMatch(c *fiber.Ctx) error {
 		return response.Error(c, err)
 	}
 
+	err = uuid.Validate(req.MatchCatID)
+	if err != nil {
+		err = custom_error.SetCustomError(&custom_error.ErrorContext{
+			HTTPCode: http.StatusNotFound,
+			Message:  "matchId is not found",
+		})
+
+		return response.Error(c, err)
+	}
+
+	err = uuid.Validate(req.UserCatID)
+	if err != nil {
+		err = custom_error.SetCustomError(&custom_error.ErrorContext{
+			HTTPCode: http.StatusNotFound,
+			Message:  "matchId is not found",
+		})
+
+		return response.Error(c, err)
+	}
+
 	req.UserID, err = uuid.Parse(util.GetUserIDFromHeader(c))
 	if err != nil {
 		return response.Error(c, err)
@@ -57,6 +77,16 @@ func (h *Handler) ApproveCatMatch(c *fiber.Ctx) error {
 		return response.Error(c, err)
 	}
 
+	err = uuid.Validate(req.MatchID.String())
+	if err != nil {
+		err = custom_error.SetCustomError(&custom_error.ErrorContext{
+			HTTPCode: http.StatusNotFound,
+			Message:  "matchId is not found",
+		})
+
+		return response.Error(c, err)
+	}
+
 	req.UserId, err = uuid.Parse(util.GetUserIDFromHeader(c))
 	if err != nil {
 		return response.Error(c, err)
@@ -74,6 +104,16 @@ func (h *Handler) RejectCatMatch(c *fiber.Ctx) error {
 	var req request.RejectCatMatch
 	err := custom_validator.ValidateStruct(c, &req)
 	if err != nil {
+		return response.Error(c, err)
+	}
+
+	err = uuid.Validate(req.MatchID.String())
+	if err != nil {
+		err = custom_error.SetCustomError(&custom_error.ErrorContext{
+			HTTPCode: http.StatusNotFound,
+			Message:  "matchId is not found",
+		})
+
 		return response.Error(c, err)
 	}
 
@@ -97,6 +137,7 @@ func (h *Handler) DeleteCatMatch(c *fiber.Ctx) error {
 			HTTPCode: http.StatusNotFound,
 			Message:  "matchId is not found",
 		})
+
 		return response.Error(c, err)
 	}
 
