@@ -19,8 +19,9 @@ func (u *Usecase) CreateCatMatch(c *fiber.Ctx, req *request.CreateCatMatch) erro
 	if err != nil {
 		err = custom_error.SetCustomError(&custom_error.ErrorContext{
 			HTTPCode: http.StatusNotFound,
-			Message:  "id is not found",
+			Message:  "issuer cat not found",
 		})
+
 		return err
 	}
 
@@ -46,8 +47,9 @@ func (u *Usecase) CreateCatMatch(c *fiber.Ctx, req *request.CreateCatMatch) erro
 	if err != nil {
 		err = custom_error.SetCustomError(&custom_error.ErrorContext{
 			HTTPCode: http.StatusNotFound,
-			Message:  "id is not found",
+			Message:  "receiver cat not found",
 		})
+
 		return err
 	}
 
@@ -63,20 +65,11 @@ func (u *Usecase) CreateCatMatch(c *fiber.Ctx, req *request.CreateCatMatch) erro
 	if issuerCat.HasMatched {
 		err = custom_error.SetCustomError(&custom_error.ErrorContext{
 			HTTPCode: http.StatusBadRequest,
-			Message:  "your cat has already matched with other cat",
+			Message:  "your cat has already matched with this cat",
 		})
 
 		return err
 	}
-
-	// if receiverCat.HasMatched {
-	// 	err = custom_error.SetCustomError(&custom_error.ErrorContext{
-	// 		HTTPCode: http.StatusBadRequest,
-	// 		Message:  "the cat you want to match with has already matched",
-	// 	})
-
-	// 	return err
-	// }
 
 	if issuerCat.UserID == receiverCat.UserID {
 		err = custom_error.SetCustomError(&custom_error.ErrorContext{
@@ -122,14 +115,7 @@ func (u *Usecase) CreateCatMatch(c *fiber.Ctx, req *request.CreateCatMatch) erro
 
 // GetListCatMatch implements IFaceUsecase.
 func (u *Usecase) GetListCatMatch(params *request.ListCatMatchQuery) ([]*response.CatMatchResponse, error) {
-	var res = make([]*response.CatMatchResponse, 0)
-
-	res, err := u.repo.FindCatMatch(params)
-	if err != nil {
-		return nil, err
-	}
-
-	return res, nil
+	return u.repo.FindCatMatch(params)
 }
 
 // ApproveCatMatch implements IFaceUsecase.
@@ -216,13 +202,14 @@ func (u *Usecase) DeleteCatMatch(c *fiber.Ctx, ID uuid.UUID) error {
 			HTTPCode: http.StatusNotFound,
 			Message:  "matchId is not found",
 		})
+
 		return err
 	}
 
-	if cm == nil {
+	if cm.IsApproved != nil {
 		err = custom_error.SetCustomError(&custom_error.ErrorContext{
-			HTTPCode: http.StatusNotFound,
-			Message:  "matchId is not found",
+			HTTPCode: http.StatusBadRequest,
+			Message:  "cannot delete cat match request",
 		})
 
 		return err
