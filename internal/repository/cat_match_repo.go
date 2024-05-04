@@ -40,7 +40,7 @@ func (r *Repository) CheckDuplicateMatchRequest(issuerCatID uuid.UUID, receiverC
 	var cnt int
 
 	if err := r.db.
-		QueryRow("SELECT COUNT(*) FROM cat_matches WHERE issuer_cat_id = $1 AND receiver_cat_id = $2 AND deleted_at iS NULL", issuerCatID, receiverCatID).
+		QueryRow("SELECT COUNT(*) FROM cat_matches WHERE issuer_cat_id = $1 AND receiver_cat_id = $2 AND is_approved IS NOT NULL AND deleted_at iS NULL", issuerCatID, receiverCatID).
 		Scan(&cnt); err != nil {
 		return err
 	}
