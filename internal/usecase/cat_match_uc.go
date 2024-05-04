@@ -242,21 +242,21 @@ func (u *Usecase) DeleteCatMatch(c *fiber.Ctx, ID uuid.UUID) error {
 		return err
 	}
 
-	if cm.IsApproved != nil {
-		if *cm.IsApproved {
-			err = custom_error.SetCustomError(&custom_error.ErrorContext{
-				HTTPCode: http.StatusBadRequest,
-				Message:  "this match request was approved",
-			})
-		} else {
-			err = custom_error.SetCustomError(&custom_error.ErrorContext{
-				HTTPCode: http.StatusBadRequest,
-				Message:  "this match request was rejected",
-			})
-		}
+	// if cm.IsApproved != nil {
+	// 	if *cm.IsApproved {
+	// 		err = custom_error.SetCustomError(&custom_error.ErrorContext{
+	// 			HTTPCode: http.StatusBadRequest,
+	// 			Message:  "this match request was approved",
+	// 		})
+	// 	} else {
+	// 		err = custom_error.SetCustomError(&custom_error.ErrorContext{
+	// 			HTTPCode: http.StatusBadRequest,
+	// 			Message:  "this match request was rejected",
+	// 		})
+	// 	}
 
-		return err
-	}
+	// 	return err
+	// }
 
 	return u.repo.DeleteCatMatchByID(ID)
 }
