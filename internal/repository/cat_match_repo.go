@@ -158,7 +158,6 @@ func (r *Repository) FindCatMatch(params *request.ListCatMatchQuery) ([]*respons
 
 		res = append(res, cmr)
 	}
-	fmt.Println(res)
 
 	return res, nil
 }

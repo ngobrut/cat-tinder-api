@@ -31,6 +31,8 @@ func OK(c *fiber.Ctx, data interface{}, code int, message string) error {
 func Error(c *fiber.Ctx, err error) error {
 	v, isValidationErr := err.(custom_validator.ValidatorError)
 	if isValidationErr {
+		fmt.Printf("[validation-error] %v\n", v.Message)
+
 		return c.Status(http.StatusBadRequest).JSON(JsonResponse{
 			Message: "validation-error",
 			Error: &ErrorResponse{
@@ -42,7 +44,7 @@ func Error(c *fiber.Ctx, err error) error {
 
 	e, isCustomErr := err.(*custom_error.CustomError)
 	if !isCustomErr {
-		fmt.Printf("[unhandled-error]\n%v\n", fmt.Sprint(err))
+		fmt.Printf("[unhandled-error] %v\n", fmt.Sprint(err))
 
 		return c.Status(http.StatusInternalServerError).JSON(JsonResponse{
 			Message: "internal-error",
@@ -64,6 +66,8 @@ func Error(c *fiber.Ctx, err error) error {
 			message = e.ErrorContext.Message
 		}
 	}
+
+	fmt.Printf("[error] %v\n", message)
 
 	return c.Status(code).JSON(JsonResponse{
 		Message: "Error",
