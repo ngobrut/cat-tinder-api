@@ -39,7 +39,7 @@ func main() {
 
 	// Listen from a different goroutine
 	go func() {
-		if err := srv.Listen(":3000"); err != nil {
+		if err := srv.Listen(":8080"); err != nil {
 			log.Panic(err)
 		}
 	}()
