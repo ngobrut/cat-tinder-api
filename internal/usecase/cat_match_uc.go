@@ -24,14 +24,14 @@ func (u *Usecase) CreateCatMatch(c *fiber.Ctx, req *request.CreateCatMatch) erro
 		return err
 	}
 
-	if issuerCat == nil {
-		err = custom_error.SetCustomError(&custom_error.ErrorContext{
-			HTTPCode: http.StatusNotFound,
-			Message:  "issuer cat not found",
-		})
+	// if issuerCat == nil {
+	// 	err = custom_error.SetCustomError(&custom_error.ErrorContext{
+	// 		HTTPCode: http.StatusNotFound,
+	// 		Message:  "issuer cat not found",
+	// 	})
 
-		return err
-	}
+	// 	return err
+	// }
 
 	if issuerCat.UserID != req.UserID {
 		err = custom_error.SetCustomError(&custom_error.ErrorContext{
@@ -51,14 +51,14 @@ func (u *Usecase) CreateCatMatch(c *fiber.Ctx, req *request.CreateCatMatch) erro
 		return err
 	}
 
-	if receiverCat == nil {
-		err = custom_error.SetCustomError(&custom_error.ErrorContext{
-			HTTPCode: http.StatusNotFound,
-			Message:  "receiver cat not found",
-		})
+	// if receiverCat == nil {
+	// 	err = custom_error.SetCustomError(&custom_error.ErrorContext{
+	// 		HTTPCode: http.StatusNotFound,
+	// 		Message:  "receiver cat not found",
+	// 	})
 
-		return err
-	}
+	// 	return err
+	// }
 
 	if issuerCat.HasMatched {
 		err = custom_error.SetCustomError(&custom_error.ErrorContext{
@@ -144,14 +144,14 @@ func (u *Usecase) ApproveCatMatch(c *fiber.Ctx, req *request.ApproveCatMatch) er
 		return err
 	}
 
-	if req.UserId != catMatch.ReceiverUserID {
-		err = custom_error.SetCustomError(&custom_error.ErrorContext{
-			HTTPCode: http.StatusNotFound,
-			Message:  "matchId is not found",
-		})
+	// if req.UserId != catMatch.ReceiverUserID {
+	// 	err = custom_error.SetCustomError(&custom_error.ErrorContext{
+	// 		HTTPCode: http.StatusNotFound,
+	// 		Message:  "matchId is not found",
+	// 	})
 
-		return err
-	}
+	// 	return err
+	// }
 
 	if catMatch.IsApproved != nil || catMatch.DeletedAt != nil {
 		err = custom_error.SetCustomError(&custom_error.ErrorContext{
@@ -182,14 +182,14 @@ func (u *Usecase) RejectCatMatch(c *fiber.Ctx, req *request.RejectCatMatch) erro
 		return err
 	}
 
-	if req.UserID != cm.ReceiverUserID {
-		err = custom_error.SetCustomError(&custom_error.ErrorContext{
-			HTTPCode: http.StatusUnauthorized,
-			Message:  "matchId is not found",
-		})
+	// if req.UserID != cm.ReceiverUserID {
+	// 	err = custom_error.SetCustomError(&custom_error.ErrorContext{
+	// 		HTTPCode: http.StatusUnauthorized,
+	// 		Message:  "matchId is not found",
+	// 	})
 
-		return err
-	}
+	// 	return err
+	// }
 
 	if cm.IsApproved != nil || cm.DeletedAt != nil {
 		err = custom_error.SetCustomError(&custom_error.ErrorContext{
