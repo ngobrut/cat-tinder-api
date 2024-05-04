@@ -69,14 +69,14 @@ func (u *Usecase) CreateCatMatch(c *fiber.Ctx, req *request.CreateCatMatch) erro
 		return err
 	}
 
-	if receiverCat.HasMatched {
-		err = custom_error.SetCustomError(&custom_error.ErrorContext{
-			HTTPCode: http.StatusBadRequest,
-			Message:  "the cat you want to match with has already matched",
-		})
+	// if receiverCat.HasMatched {
+	// 	err = custom_error.SetCustomError(&custom_error.ErrorContext{
+	// 		HTTPCode: http.StatusBadRequest,
+	// 		Message:  "the cat you want to match with has already matched",
+	// 	})
 
-		return err
-	}
+	// 	return err
+	// }
 
 	if issuerCat.UserID == receiverCat.UserID {
 		err = custom_error.SetCustomError(&custom_error.ErrorContext{
