@@ -22,6 +22,7 @@ func Exec() error {
 	uc := usecase.New(cnf, db, repo)
 	app := handler.InitHTTPHandler(cnf, uc)
 
+	log.Printf("app running on :%d", 8080)
 	err = app.Listen(":8080")
 	if err != nil {
 		return err
